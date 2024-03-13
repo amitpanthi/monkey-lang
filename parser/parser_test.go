@@ -3,6 +3,7 @@ package parser
 import (
 	"monkey/ast"
 	"monkey/lexer"
+	"monkey/token"
 	"testing"
 )
 
@@ -16,6 +17,7 @@ func TestLetStatements(t *testing.T) {
 	p := New(l)
 
 	program := p.ParseProgram()
+	checkParserErrors(t, p)
 
 	if program == nil {
 		t.Fatalf("Parser was unable to parse any tokens")
@@ -37,6 +39,42 @@ func TestLetStatements(t *testing.T) {
 		stmt := program.Statements[i]
 		if !testLetStatement(t, stmt, test.expectedIdentifier) {
 			return
+		}
+	}
+}
+
+func TestReturnStatements(t *testing.T) {
+	input := `
+	return 5;
+	return 10;
+	return 993322;
+	`
+	l := lexer.New(input)
+	p := New(l)
+
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if program == nil {
+		t.Fatalf("parser was unable to parse any tokens")
+	}
+
+	if len(program.Statements) != 3 {
+		t.Fatalf("program.Statements has length %d, expected %d",
+			len(program.Statements), 3)
+	}
+
+	for _, stmt := range program.Statements {
+		returnStmt, ok := stmt.(*ast.ReturnStatement)
+		if !ok {
+			t.Errorf("Encountered statement was not *ast.ReturnStatement, got %T",
+				stmt)
+			continue
+		}
+
+		if returnStmt.TokenLiteral() != "return" {
+			t.Errorf("statement's token does not match, expected %s got %s",
+				token.RETURN, returnStmt.TokenLiteral())
 		}
 	}
 }
@@ -65,4 +103,18 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	}
 
 	return true
+}
+
+func checkParserErrors(t *testing.T, p *Parser) {
+	errors := p.Errors()
+
+	if len(errors) == 0 {
+		return
+	}
+
+	t.Errorf("parser has %d errors", len(errors))
+	for _, err := range errors {
+		t.Errorf("parser error: %q", err)
+	}
+	t.FailNow()
 }
