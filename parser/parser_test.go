@@ -79,6 +79,73 @@ func TestReturnStatements(t *testing.T) {
 	}
 }
 
+func TestIdentifierExpression(t *testing.T) {
+	input := "foobar"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("len(program.Statements) is not 1, got %d", len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("given input is not of type *ast.ExpressionStatement, got %T",
+			program.Statements[0])
+	}
+
+	ident, ok := stmt.Expression.(*ast.Identifier)
+	if !ok {
+		t.Fatalf("given input is not of type *ast.Identifier, got %T",
+			ident)
+	}
+
+	if ident.TokenLiteral() != "foobar" {
+		t.Fatalf("ident.TokenLiteral() is not 'foobar', got %s instead",
+			ident.TokenLiteral())
+	}
+
+	if ident.Value != "foobar" {
+		t.Fatalf("ident.Value is not 'foobar', got %s instead", ident.Value)
+	}
+}
+
+func TestIntegerLiteralExpressions(t *testing.T) {
+	input := "5;"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("len(program.Statements) is not 1, got %d", len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("given input is not of type *ast.ExpressionStatement, got %T",
+			program.Statements[0])
+	}
+
+	intStmt, ok := stmt.Expression.(*ast.IntegerLiteral)
+	if !ok {
+		t.Fatalf("given input is not of type *ast.IntegerLiteral, got %T",
+			stmt.Expression)
+	}
+
+	if intStmt.TokenLiteral() != "5" {
+		t.Fatalf("ident.TokenLiteral() is not '5', got %s instead",
+			intStmt.TokenLiteral())
+	}
+
+	if intStmt.Value != 5 {
+		t.Fatalf("ident.Value is not '5', got %d instead", intStmt.Value)
+	}
+}
+
 func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	if s.TokenLiteral() != "let" {
 		t.Fatalf("s.TokenLiteral() not let, got %s", s.TokenLiteral())
