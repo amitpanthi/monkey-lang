@@ -9,7 +9,17 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceRoot}"
-        }
-    ]
+            "program": "${workspaceFolder}"
+        },
+        {
+            "name": "Test Parser",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/parser/parser_test.go",
+            "env": {},
+            "args": [],
+            "showLog": true
+        }       
+    ],
 }
