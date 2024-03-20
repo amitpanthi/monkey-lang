@@ -150,3 +150,12 @@ func (ie *InfixExpression) String() string {
 
 	return out.String()
 }
+
+type Boolean struct {
+	Token token.Token
+	Value bool
+}
+
+func (be *Boolean) expressionNode()      {}
+func (be *Boolean) TokenLiteral() string { return be.Token.Literal }
+func (be *Boolean) String() string       { return be.Token.Literal }
